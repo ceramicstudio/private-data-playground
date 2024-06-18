@@ -1,13 +1,12 @@
 import { type NextApiRequest, type NextApiResponse } from "next";
 import { passport } from "@/utils/passport";
-import { type Error } from "@/types";
 
 interface Response extends NextApiResponse {
   status(code: number): Response;
   send(
     data:
       | { score: string; address: string; last_score_timestamp: string }
-      | Error,
+      | { error: string },
   ): void;
 }
 

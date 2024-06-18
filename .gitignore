@@ -41,3 +41,6 @@ yarn-error.log*
 # local files
 composite.json
 graphiql.mjs
+
+# Ceramic
+/.ceramic

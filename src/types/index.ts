@@ -1,4 +1,9 @@
 
+
+export interface Payload {
+  message: string;
+}
+
 export type Post = {
   body: string;
   id: string;

@@ -1,19 +1,19 @@
 {
-  "name": "recon-video",
+  "name": "privacy-app",
   "version": "0.1.0",
   "private": true,
   "type": "module",
   "scripts": {
     "build": "next build",
     "generate": "node scripts/commands.mjs",
-    "dev": "node scripts/run.mjs",
-    "nextDev": "next dev",
-    "ceramic": "CERAMIC_ENABLE_EXPERIMENTAL_COMPOSE_DB='true' ceramic daemon --config ./composedb.config.json",
+    "dev": "next dev",
+    "ceramic": "ceramic-one daemon",
     "lint": "next lint",
     "start": "next start"
   },
   "dependencies": {
     "@composedb/client": "^0.7.1",
+    "cartonne": "^3.0.1",
     "@composedb/devtools-node": "^0.7.1",
     "@google-cloud/local-auth": "2.1.0",
     "@notionhq/client": "^2.2.15",
@@ -54,6 +54,7 @@
     "cmdk": "^1.0.0",
     "date-fns": "^3.6.0",
     "did-session": "^2.1.1",
+    "dids": "^5.0.2",
     "embla-carousel-react": "^8.0.0",
     "ethers": "^5.7.2",
     "exec": "^0.2.1",
