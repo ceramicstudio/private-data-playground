@@ -1,10 +1,13 @@
 import { useWalletClient } from "wagmi";
 import TextareaAutosize from "react-textarea-autosize";
 import { useEffect, useState } from "react";
+import {  type DID } from "dids";
+import {StreamID} from "@/components/services/stream-id"
+import {eventToCAR} from "@/components/services/encoding"
 import { useAccount } from "wagmi";
 import useStore from "@/zustand/store";
 import Head from "next/head";
-import { createStream, writeToRecon } from "@/components/services/stream";
+import { createEvent, writeToRecon } from "@/components/services/stream";
 
 declare global {
   interface Window {
@@ -33,10 +36,14 @@ export default function Home() {
       if (!session || !message) {
         throw new Error("Session or message not found");
       }
-      const stream = await createStream(session, { message });
-      const write = await writeToRecon(stream, endpoint);
-      console.log(write);
-      return write;
+      const streamId = new StreamID("MID", "bagcqcerakszw2vsovxznyp5gfnpdj4cqm2xiv76yd24wkjewhhykovorwo6a");
+      console.log(streamId);
+      const event = await createEvent(session.did as unknown as  DID, { message }, streamId);
+      console.log(event, "event");
+      const car = eventToCAR(event.payload, event.signedEvent);
+      const response = await writeToRecon(car, endpoint, event.signedEvent);
+      console.log(car);
+      return car;
     } catch (error) {
       console.error(error);
     }

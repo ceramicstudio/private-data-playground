@@ -1,4 +1,4 @@
-
+export type UnknownContent = Record<string, unknown>
 
 export interface Payload {
   message: string;

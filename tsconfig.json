@@ -8,6 +8,7 @@
     "resolveJsonModule": true,
     "moduleDetection": "force",
     "isolatedModules": true,
+    "experimentalDecorators": true,
 
     /* Strictness */
     "strict": true,
