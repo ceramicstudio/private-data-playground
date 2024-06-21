@@ -7,6 +7,7 @@ import { eventToCAR } from "@/components/services/encoding";
 import { useAccount } from "wagmi";
 import useStore from "@/zustand/store";
 import { Button } from "@/components/ui/button";
+import { useTheme } from "next-themes";
 import {
   Card,
   CardContent,
@@ -39,12 +40,14 @@ export default function Home() {
   const [delegatedReadId, setDelegatedReadId] = useState<string>("");
   const [writeOrRead, setWriteOrRead] = useState<string | undefined>(undefined);
   const [capability, setCapability] = useState<string>("");
+  const { theme, setTheme } = useTheme();
 
   useEffect(() => {
+    setTheme("dark");
     if (address) {
       setLoggedIn(true);
       if (walletClient && loggedIn) {
-        setSession(walletClient)
+        setSession(walletClient);
       }
     }
     return () => {
