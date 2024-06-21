@@ -116,26 +116,28 @@ export default function Home() {
 
   return (
     <div className="min-h-screen">
-      <div className="mt-4 flex w-screen flex-row items-center justify-center gap-4 p-4">
-        <Button
-          variant="outline"
-          className="ml-4 mr-4 text-xs"
-          onClick={() => {
-            setWriteOrRead("write");
-          }}
-        >
-          Write
-        </Button>
-        <Button
-          className="text-xs"
-          variant="outline"
-          onClick={() => {
-            setWriteOrRead("read");
-          }}
-        >
-          Read
-        </Button>
-      </div>
+      {loggedIn && loggedIn !== "loading" && (
+        <div className="mt-4 flex w-screen flex-row items-center justify-center gap-4 p-4">
+          <Button
+            variant="outline"
+            className="ml-4 mr-4 text-xs"
+            onClick={() => {
+              setWriteOrRead("write");
+            }}
+          >
+            Write
+          </Button>
+          <Button
+            className="text-xs"
+            variant="outline"
+            onClick={() => {
+              setWriteOrRead("read");
+            }}
+          >
+            Read
+          </Button>
+        </div>
+      )}
       <Head>
         <title>Create Trust Credentials</title>
         <meta name="description" content="" />
@@ -145,7 +147,7 @@ export default function Home() {
       </Head>
       <div className="border-border ">
         <main className="container mx-auto">
-          {loggedIn && (
+          {loggedIn && loggedIn !== "loading" && (
             <>
               <div className="relative mx-auto w-full max-w-4xl pt-4 text-center">
                 <div className="mt-10 flex flex-row items-center justify-center space-x-4">
