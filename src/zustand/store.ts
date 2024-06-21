@@ -5,8 +5,8 @@ import { type GetWalletClientResult } from "@wagmi/core";
 
 type Store = {
   endpoint: string;
-  session?: DIDSession;
-  setSession: (wallet: GetWalletClientResult) => void;
+  session?: DIDSession | undefined;
+  setSession: (wallet: GetWalletClientResult | undefined) => void;
 };
 
 const StartAuth = async (
@@ -41,16 +41,23 @@ const useStore = create<Store>((set) => ({
   endpoint: "http://localhost:5001",
   session: undefined,
   setSession: (wallet) => {
-    StartAuth(wallet)
-      .then((auth) => {
-        set((state: Store) => ({
-          ...state,
-          session: auth,
-        }));
-      })
-      .catch((err) => {
-        console.error(err);
-      });
+    if (wallet) {
+      StartAuth(wallet)
+        .then((auth) => {
+          set((state: Store) => ({
+            ...state,
+            session: auth,
+          }));
+        })
+        .catch((err) => {
+          console.error(err);
+        });
+    } else {
+      set((state: Store) => ({
+        ...state,
+        session: undefined,
+      }));
+    }
   },
 }));
 

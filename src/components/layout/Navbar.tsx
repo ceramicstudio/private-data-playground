@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
 import { navLinks } from "@/data/navLinks";
 import { useState, useRef } from "react";
 import { useClickAway } from "react-use";
@@ -30,12 +29,10 @@ const NavMobile = () => {
 
 const Navbar = () => {
   return (
-    <nav className="bg-background/30 py-4 backdrop-blur-sm">
-      <div className="container flex flex-row items-center justify-between">
-        <div className="container flex flex-row items-center justify-start">
+    <nav className="bg-background/70 py-4 backdrop-blur-sm">
+      <div className="container flex flex-row items-center justify-center">
+        {/* <div className="container flex flex-row items-center justify-start">
           <Link href="/" className="hidden md:block">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            {/* <img src="/logo.png" alt="logo" className="h-8" /> */}
             <p className="text-lg font-bold text-white">LOGO</p>
           </Link>
           <ul className="ml-8 hidden flex-row justify-between gap-8 md:flex">
@@ -46,13 +43,13 @@ const Navbar = () => {
             ))}
           </ul>
           <NavMobile />
-        </div>
-        <div className="flex flex-row justify-end space-x-2">
-          <ThemeChanger />
+        </div> */}
+        <div className="flex flex-row space-x-2">
+          {/* <ThemeChanger /> */}
           {/* <Button onClick={() => (window.location.href = "/quiz")}>
             Get Started
           </Button> */}
-          <div className="flex w-full items-center justify-end">
+          <div className="flex w-full items-center ">
             <w3m-button size="sm" balance="hide" />
           </div>
         </div>
