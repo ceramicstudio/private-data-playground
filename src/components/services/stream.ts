@@ -33,11 +33,11 @@ export const writeToRecon = async (car: CAR, endpoint: string, signedEvent: Sign
       throw new Error("Error creating CAR file");
     }
 
-    const cid = signedEvent.jws.link!.toString();
+    const cid = car.roots[0]
 
      const body = JSON.stringify({
         data: car.toString(),
-        id: cid,
+        id: cid!.toString(),
       })
 
       console.log(body);
@@ -50,6 +50,22 @@ export const writeToRecon = async (car: CAR, endpoint: string, signedEvent: Sign
       body,
     });
     const result = await response.json() as Record<string, unknown>;
+    console.log(result);
+    return result;
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+export const getEvent = async (event: string, endpoint: string) => {
+  try {
+    const response = await fetch(`http://localhost:5001/ceramic/events/version`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      }
+    });
+    const result = await response.json()
     console.log(result);
     return result;
   } catch (error) {

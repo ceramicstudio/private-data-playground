@@ -6,7 +6,7 @@
   "scripts": {
     "build": "next build",
     "generate": "node scripts/commands.mjs",
-    "dev": "next dev",
+    "dev": "next dev -p 5001",
     "ceramic": "ceramic-one daemon",
     "lint": "next lint",
     "start": "next start"

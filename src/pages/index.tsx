@@ -7,7 +7,7 @@ import {eventToCAR} from "@/components/services/encoding"
 import { useAccount } from "wagmi";
 import useStore from "@/zustand/store";
 import Head from "next/head";
-import { createEvent, writeToRecon } from "@/components/services/stream";
+import { createEvent, writeToRecon, getEvent } from "@/components/services/stream";
 
 declare global {
   interface Window {
@@ -42,8 +42,9 @@ export default function Home() {
       console.log(event, "event");
       const car = eventToCAR(event.payload, event.signedEvent);
       const response = await writeToRecon(car, endpoint, event.signedEvent);
-      console.log(car);
-      return car;
+      // const result = await getEvent(car.roots[0]!.toString(), endpoint);
+      console.log(response);
+      return response;
     } catch (error) {
       console.error(error);
     }
