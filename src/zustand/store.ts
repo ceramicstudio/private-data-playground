@@ -26,7 +26,7 @@ const StartAuth = async (
 
     // @ts-expect-error did-session
     const session = await DIDSession.get(accountId, authMethod, {
-      resources: ["ceramic://*"],
+      resources: ["ceramic://*?model=kjzl6hvfrbw6cadyci5lvsff4jxl1idffrp2ld3i0k1znz0b3k67abkmtf7p7q3"],
     });
     localStorage.setItem("did", session.did.parent);
 

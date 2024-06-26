@@ -59,30 +59,34 @@ export default function Home() {
       setDelegatedReadId("");
       setCapability("");
     };
-  }, [address, walletClient, loggedIn, setSession, writeOrRead]);
+  }, [address, walletClient, loggedIn, setSession, writeOrRead, setTheme]);
 
   const submitMessage = async () => {
     try {
       if (!session || !message) {
         throw new Error("Session or message not found");
       }
-      // const streamId = new StreamID(
-      //   "MID",
-      //   "bagcqcerakszw2vsovxznyp5gfnpdj4cqm2xiv76yd24wkjewhhykovorwo6a",
-      // );
-      // console.log(streamId);
-      // const event = await createEvent(
-      //   session.did as unknown as DID,
-      //   { message },
-      //   streamId,
-      // );
-      // console.log(event, "event");
-      // const car = eventToCAR(event.payload, event.signedEvent);
-      // const response = await writeToRecon(car, endpoint, event.signedEvent);
-      // const result = await getEvent(car.roots[0]!.toString(), endpoint);
-      // console.log(response);
-      // return response;
-      setWriteStreamId("thisisafakestreamid");
+      const streamId = new StreamID(
+        "MID",
+        "bagcqcera26p4nkhr7r6a3l5sbzpwyfpwj5xdwf5mzdyizxaufsaydbutiznq", // corresponding CID of parent model: https://ceramic-orbisdb-mainnet-direct.hirenodes.io/api/v0/streams/kjzl6hvfrbw6cadyci5lvsff4jxl1idffrp2ld3i0k1znz0b3k67abkmtf7p7q3
+      );
+      console.log(streamId);
+      const event = await createEvent(
+        session.did as unknown as DID,
+        { message },
+        streamId,
+      );
+      console.log(event, "event");
+      const car = eventToCAR(event.payload, event.signedEvent);
+      const response = await writeToRecon(car, endpoint);
+      const gotEvent = await getEvent(car.roots[0]!.toString(), endpoint);
+      const resultId = new StreamID(
+        "MID",
+        gotEvent?.id as string,
+      );
+      setWriteStreamId(resultId.baseID.toString());
+      return response;
+
     } catch (error) {
       console.error(error);
     }
@@ -212,7 +216,7 @@ export default function Home() {
                                   ></input>
                                   <button
                                     onClick={() => {
-                                      navigator.clipboard.writeText(
+                                      void navigator.clipboard.writeText(
                                         writeStreamId,
                                       );
                                     }}
@@ -260,7 +264,7 @@ export default function Home() {
                                     className="mt-4 w-1/5 self-start text-xs"
                                     variant="secondary"
                                     onClick={() => {
-                                      createCapability();
+                                      void createCapability();
                                     }}
                                   >
                                     Create Capability
@@ -281,7 +285,7 @@ export default function Home() {
                                     ></input>
                                     <button
                                       onClick={() => {
-                                        navigator.clipboard.writeText(
+                                        void navigator.clipboard.writeText(
                                           capability,
                                         );
                                       }}
