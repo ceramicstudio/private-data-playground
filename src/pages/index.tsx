@@ -22,11 +22,16 @@ import {
   writeToRecon,
   getEvent,
 } from "@/components/services/stream";
+import { biscuit, KeyPair } from "@biscuit-auth/biscuit-wasm";
 
 declare global {
   interface Window {
     ethereum?: Record<string, unknown> | undefined;
   }
+}
+
+async function attenuateSession(session: BiscuitDIDSession): BiscuitDIDSession {
+
 }
 
 export default function Home() {
@@ -71,8 +76,22 @@ export default function Home() {
         "bagcqcera26p4nkhr7r6a3l5sbzpwyfpwj5xdwf5mzdyizxaufsaydbutiznq", // corresponding CID of parent model: https://ceramic-orbisdb-mainnet-direct.hirenodes.io/api/v0/streams/kjzl6hvfrbw6cadyci5lvsff4jxl1idffrp2ld3i0k1znz0b3k67abkmtf7p7q3
       );
       console.log(streamId);
+
+      const did = session.didSession.did;
+      //attach our biscuit to our did
+      //TODO: the capability is part of the did, rather than being passed in for signing, should this be changed
+      const builder = biscuit`
+        user(${did.id});
+        check if resource("${streamId}");
+        right("write");
+      `;
+      const token = builder.build(session.keypair.getPrivateKey());
+      const currentResources = session.didSession.cacao.p.resources ?? [];
+      currentResources.push(token.toBase64());
+      session.didSession.cacao.p.resources = currentResources;
+
       const event = await createEvent(
-        session.did as unknown as DID,
+        session.didSession.did as unknown as DID,
         { message },
         streamId,
       );

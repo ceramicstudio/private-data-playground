@@ -1,7 +1,21 @@
 import { create } from "zustand";
-import { DIDSession } from "did-session";
+import {createDIDKey, DIDSession} from "did-session";
 import { EthereumWebAuth, getAccountId } from "@didtools/pkh-ethereum";
 import { type GetWalletClientResult } from "@wagmi/core";
+import { KeyPair } from "@biscuit-auth/biscuit-wasm";
+import { CARFactory, CAR } from 'cartonne'
+import {DID} from "dids";
+import { AuthSession } from "./auth";
+
+type DIDSession = {
+  didSession: DIDSession,
+  delegatedDid: DID,
+  refresh_token: CAR,
+}
+
+type AttenuatedDIDSession = DIDSession & {
+  access_token: CAR,
+}
 
 type Store = {
   endpoint: string;
@@ -9,29 +23,34 @@ type Store = {
   setSession: (wallet: GetWalletClientResult | undefined) => void;
 };
 
+async function createAccessToken(session: DIDSession): DID {
+  // create a did for the access token
+  const accessTokenDid = await createDIDKey();
+  const accessToken = {
+    ...session.delegatedDid.capability.p,
+    aud: accessTokenDid.id,
+    iss: session.didSession.delegatedDid.id,
+    resources: [...(cacao1.p.resources || []), `prev:${cacao1cid.toString()}`],
+  }
+
+}
+
 const StartAuth = async (
   walletClient: GetWalletClientResult,
 ): Promise<DIDSession | undefined> => {
   if (walletClient) {
-    const accountId = (await getAccountId(
-      walletClient,
-      walletClient.account.address,
-    )) as unknown as string;
 
-    const authMethod = await EthereumWebAuth.getAuthMethod(
-      walletClient,
-      // @ts-expect-error did-session
-      accountId,
-    );
+    localStorage.setItem("refresh", didSession.did.parent);
 
-    // @ts-expect-error did-session
-    const session = await DIDSession.get(accountId, authMethod, {
-      resources: ["ceramic://*?model=kjzl6hvfrbw6cadyci5lvsff4jxl1idffrp2ld3i0k1znz0b3k67abkmtf7p7q3"],
-    });
-    localStorage.setItem("did", session.did.parent);
 
-    console.log("isAuth:", session);
-    return session;
+
+    console.log("isAuth:", didSession);
+
+    return {
+      didSession,
+      delegatedDid,
+      refreshToken,
+    };
   }
 
   return undefined;
