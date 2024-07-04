@@ -66,15 +66,14 @@ export default function Home() {
       if (!session || !message) {
         throw new Error("Session or message not found");
       }
-      const streamId = new StreamID(
+      const MODEL_STREAM_ID = new StreamID(
         "MID",
         "bagcqcera26p4nkhr7r6a3l5sbzpwyfpwj5xdwf5mzdyizxaufsaydbutiznq", // corresponding CID of parent model: https://ceramic-orbisdb-mainnet-direct.hirenodes.io/api/v0/streams/kjzl6hvfrbw6cadyci5lvsff4jxl1idffrp2ld3i0k1znz0b3k67abkmtf7p7q3
       );
-      console.log(streamId);
       const event = await createEvent(
         session.did as unknown as DID,
         { message },
-        streamId,
+        MODEL_STREAM_ID,
       );
       console.log(event, "event");
       const car = eventToCAR(event.payload, event.signedEvent);

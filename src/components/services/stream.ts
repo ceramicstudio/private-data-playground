@@ -11,14 +11,13 @@ import { type StreamID } from "./stream-id";
 export const createEvent = async (
   DID: DID,
   payload: UnknownContent,
-  stream: StreamID,
+  modelStreamID: StreamID,
 ): Promise<{ signedEvent: SignedEvent; payload: typeof InitEventPayload }> => {
-  const event = await createInitEvent({
+  return createInitEvent({
     content: payload,
     controller: DID,
-    model: stream,
+    model: modelStreamID,
   });
-  return event;
 };
 
 export const writeToRecon = async (car: CAR, endpoint: string) => {
