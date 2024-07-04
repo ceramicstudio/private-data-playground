@@ -80,13 +80,9 @@ export default function Home() {
       const car = eventToCAR(event.payload, event.signedEvent);
       const response = await writeToRecon(car, endpoint);
       const gotEvent = await getEvent(car.roots[0]!.toString(), endpoint);
-      const resultId = new StreamID(
-        "MID",
-        gotEvent?.id as string,
-      );
+      const resultId = new StreamID("MID", gotEvent?.id as string);
       setWriteStreamId(resultId.baseID.toString());
       return response;
-
     } catch (error) {
       console.error(error);
     }
@@ -186,9 +182,7 @@ export default function Home() {
                               className="outline-dark mt-4 min-h-24 resize-none border border-gray-800 text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
                               placeholder="Enter your message here..."
                               value={message}
-                              onChange={(
-                                e: React.ChangeEvent<HTMLTextAreaElement>,
-                              ) => {
+                              onChange={(e) => {
                                 setMessage(e.target.value);
                               }}
                             />
@@ -254,9 +248,7 @@ export default function Home() {
                                     className="outline-dark mt-4 min-h-12 resize-none border border-gray-800 text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
                                     placeholder="Enter your desired delegated DID here..."
                                     value={delegatedReadId}
-                                    onChange={(
-                                      e: React.ChangeEvent<HTMLTextAreaElement>,
-                                    ) => {
+                                    onChange={(e) => {
                                       setDelegatedReadId(e.target.value);
                                     }}
                                   />
@@ -344,9 +336,7 @@ export default function Home() {
                               className="outline-dark mt-4 min-h-24 resize-none border border-gray-800 text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
                               placeholder="Enter your Stream ID here..."
                               value={readStreamId}
-                              onChange={(
-                                e: React.ChangeEvent<HTMLTextAreaElement>,
-                              ) => {
+                              onChange={(e) => {
                                 setReadStreamId(e.target.value);
                               }}
                             />
@@ -357,9 +347,7 @@ export default function Home() {
                               className="outline-dark mt-4 min-h-24 resize-none border border-gray-800 text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
                               placeholder="Enter your Stream ID here..."
                               value={capability}
-                              onChange={(
-                                e: React.ChangeEvent<HTMLTextAreaElement>,
-                              ) => {
+                              onChange={(e) => {
                                 setCapability(e.target.value);
                               }}
                             />
