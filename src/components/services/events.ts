@@ -4,35 +4,31 @@ import { type DID } from "dids";
 import {
   cid,
   didString,
-  uint8ArrayAsBase64,
-  type DIDString,
   asDIDString,
   uint8array,
   JWSSignature,
 } from "@didtools/codecs";
 import {
-  type OutputOf,
   type TypeOf,
   array,
   boolean,
   literal,
-  nullCodec,
   optional,
   sparse,
-  strict,
   string,
   tuple,
-  union,
+  validate,
   unknown,
-  unknownRecord,
   Type,
-  Context,
+  type Context,
 } from "codeco";
 import { StreamID } from "./stream-id";
 
 export type CreateInitHeaderParams = {
   model: StreamID;
-  controller: DIDString | string;
+  // FIXME SU: Sorry types, I do not know why that does not work
+  // controller: DIDString | string;
+  controller: string;
   unique?: Uint8Array | boolean;
   context?: StreamID;
   shouldIndex?: boolean;
@@ -63,7 +59,7 @@ export type CreateInitEventParams<T extends UnknownContent = UnknownContent> = {
 
 export const InitEventHeader = sparse(
   {
-    controllers: tuple([didString]),
+    controllers: tuple([didString] as const),
     model: streamIDAsBytes,
     sep: string,
     unique: optional(uint8array),
@@ -81,10 +77,10 @@ export const InitEventPayload = sparse(
   },
   "InitEventPayload",
 );
+export type InitEventPayload = TypeOf<typeof InitEventPayload>;
 
-export type PartialInitEventHeader = Omit<InitEventHeader, "controllers"> & {
-  controllers?: [DIDString];
-};
+export type PartialInitEventHeader = Omit<InitEventHeader, "controllers"> &
+  Pick<Partial<InitEventHeader>, "controllers">;
 
 export const DagJWS = sparse({
   payload: string,
@@ -95,7 +91,6 @@ export type DagJWS = TypeOf<typeof DagJWS>;
 
 export const SignedEvent = sparse(
   {
-    // @ts-ignore
     jws: DagJWS,
     linkedBlock: uint8array,
     cacaoBlock: optional(uint8array),
@@ -123,7 +118,7 @@ export function assertValidContentLength(content: unknown) {
 
 export const DocumentInitEventHeader = sparse(
   {
-    controllers: tuple([didString]),
+    controllers: tuple([didString] as const),
     model: streamIDAsBytes,
     sep: literal("model"),
     unique: optional(uint8array),
@@ -138,7 +133,6 @@ export function createInitHeader(
   params: CreateInitHeaderParams,
 ): DocumentInitEventHeader {
   const header: DocumentInitEventHeader = {
-    //@ts-ignore
     controllers: [asDIDString(params.controller)],
     model: params.model,
     sep: "model",
@@ -201,7 +195,7 @@ export async function createInitEvent<
   T extends UnknownContent = UnknownContent,
 >(
   params: CreateInitEventParams<T>,
-): Promise<{ signedEvent: SignedEvent; payload: typeof InitEventPayload }> {
+): Promise<{ signedEvent: SignedEvent; codec: typeof InitEventPayload }> {
   const { content, controller, ...headerParams } = params;
   assertValidContentLength(content);
   const header = createInitHeader({
@@ -209,10 +203,6 @@ export async function createInitEvent<
     controller: controller.id,
     unique: false, // non-deterministic event
   });
-  // @ts-ignore
-  const payload = InitEventPayload;
-  console.log(payload);
-  // @ts-ignore
   const signedEvent = await createSignedInitEvent(controller, content, header);
-  return { signedEvent, payload };
+  return { signedEvent, codec: InitEventPayload };
 }

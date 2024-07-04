@@ -75,12 +75,13 @@ export default function Home() {
         { message },
         MODEL_STREAM_ID,
       );
-      console.log(event, "event");
-      const car = eventToCAR(event.payload, event.signedEvent);
+      console.log("event", event);
+      const car = eventToCAR(event.codec, event.signedEvent);
       const response = await writeToRecon(car, endpoint);
       const gotEvent = await getEvent(car.roots[0]!.toString(), endpoint);
-      const resultId = new StreamID("MID", gotEvent?.id as string);
-      setWriteStreamId(resultId.baseID.toString());
+      const resultId = new StreamID("MID", gotEvent?.id as string).baseID;
+      console.log("result.streamId", resultId.toString());
+      setWriteStreamId(resultId.toString());
       return response;
     } catch (error) {
       console.error(error);

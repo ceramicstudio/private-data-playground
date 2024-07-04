@@ -12,7 +12,7 @@ export const createEvent = async (
   DID: DID,
   payload: UnknownContent,
   modelStreamID: StreamID,
-): Promise<{ signedEvent: SignedEvent; payload: typeof InitEventPayload }> => {
+): Promise<{ signedEvent: SignedEvent; codec: typeof InitEventPayload }> => {
   return createInitEvent({
     content: payload,
     controller: DID,
