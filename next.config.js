@@ -3,6 +3,39 @@
  * for Docker builds.
  */
 await import("./src/env.js");
+import CopyPlugin from "copy-webpack-plugin";
+
+function patchWasmModuleImport(config, isServer) {
+  config.experiments = {
+    layers: true,
+    asyncWebAssembly: true,
+  };
+
+  console.log("isServer", isServer);
+  if (isServer) {
+    config.output.webassemblyModuleFilename =
+      "./../server/chunks/[modulehash].wasm";
+
+    const patterns = [];
+
+    const destinations = [
+      "../static/wasm/[name][ext]", // -> .next/static/wasm
+      "./static/wasm/[name][ext]", // -> .next/server/static/wasm
+      ".", // -> .next/server/chunks (for some reason this is necessary)
+    ];
+    for (const dest of destinations) {
+      patterns.push({
+        context: ".next/server/chunks",
+        from: ".",
+        to: dest,
+        filter: (resourcePath) => resourcePath.endsWith(".wasm"),
+        noErrorOnMissing: true,
+      });
+    }
+
+    config.plugins.push(new CopyPlugin({ patterns }));
+  }
+}
 
 /** @type {import("next").NextConfig} */
 const config = {
@@ -17,7 +50,11 @@ const config = {
   //   locales: ["en"],
   //   defaultLocale: "en",
   // },
-  output: 'export',
+  output: "export",
+  webpack: (config, options) => {
+    patchWasmModuleImport(config, options.isServer);
+    return config;
+  },
 };
 
 export default config;

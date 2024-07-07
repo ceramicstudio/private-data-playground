@@ -1,3 +1,5 @@
+'use client'
+
 import { type DID } from "dids";
 import { type UnknownContent } from "@/types";
 import { type CAR } from "cartonne";
