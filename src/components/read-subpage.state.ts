@@ -1,10 +1,12 @@
 import type { DIDSession } from "did-session";
 import { signal, type Signal } from "@preact/signals-react";
 import type { StreamID } from "@/components/services/stream-id";
-import { base64urlnopad, utf8 } from "@scure/base";
+import { base64nopad, base64urlnopad } from "@scure/base";
 import { CARFactory } from "cartonne";
-import { Cacao } from "@didtools/cacao";
+import { type Cacao } from "@didtools/cacao";
 import { createJwsCacao } from "@/components/create-jws-cacao";
+import { getEvent } from "@/components/services/stream";
+import * as DAG_JOSE from "dag-jose";
 
 type Underlying = {
   message: string | undefined;
@@ -20,65 +22,84 @@ export class ReadSubpageState {
     this.session = session;
     this.endpoint = endpoint;
     this.carFactory = new CARFactory();
+    this.carFactory.codecs.add(DAG_JOSE);
     this.signal = signal({ message: undefined });
   }
 
-  loadStream(streamId: StreamID, capability: string) {
+  private async makeInvocationCapability(
+    capability: string,
+  ): Promise<string | undefined> {
     const session = this.session;
     if (!session) return;
-    const local = session.did;
-    const subjectDIDUrl = session.did.parent;
+    return import("@biscuit-auth/biscuit-wasm").then(async (module) => {
+      const carBytes = base64urlnopad.decode(capability);
+      const car = this.carFactory.fromBytes(carBytes);
+      const delegatedCacaoCID = car.roots[0];
+      if (!delegatedCacaoCID) {
+        throw new Error(`No root`);
+      }
+
+      // userB -> keyB
+      const innerCacao = session.cacao;
+      const innerCacaoCID = car.put(innerCacao);
+      // keyB -> keyB: referencing a capability from writer, and innerCacao
+      const selfCacaoP: Cacao["p"] = {
+        ...session.cacao.p,
+        aud: session.did.id,
+        iss: session.did.id,
+        resources: [
+          ...(session.cacao.p.resources ?? []),
+          `prev:${innerCacaoCID.toString()}`,
+          `prev:${delegatedCacaoCID.toString()}`,
+        ],
+      };
+      const signedSelfCacao = await createJwsCacao(session.did, selfCacaoP);
+      car.put(signedSelfCacao, { isRoot: true });
+
+      const capabilityForInvocation = base64urlnopad.encode(car.bytes);
+
+      console.log("capabilityForInvocation.0", capabilityForInvocation);
+      return capabilityForInvocation;
+    });
+  }
+
+  loadStream(streamId: StreamID, capability: string): void {
+    const session = this.session;
+    if (!session) return;
     console.log("loadStream", streamId, capability);
-    import("@biscuit-auth/biscuit-wasm")
-      .then(async (module) => {
-        const biscuit = module.biscuit;
-        const BiscuitBuilder = module.BiscuitBuilder;
-
-        const carBytes = base64urlnopad.decode(capability);
-        const car = this.carFactory.fromBytes(carBytes);
-        const delegatedCacaoCID = car.roots[0];
-        if (!delegatedCacaoCID) {
-          throw new Error(`No root`);
+    this.makeInvocationCapability(capability)
+      .then(async (capabilityForInvocation) => {
+        const eventId = streamId.cid.toString();
+        // FIXME Ready to pass it to rust
+        console.log("ready to pass it to rust");
+        const event = await getEvent(
+          eventId,
+          this.endpoint,
+          capabilityForInvocation,
+        );
+        if (!event) {
+          throw new Error(`Unable to load stream: ${streamId.toString()}`);
         }
-
-        const innerCacao = session.cacao;
-        const innerCacaoCID = car.put(innerCacao);
-        const selfCacaoP: Cacao["p"] = {
-          ...session.cacao.p,
-          aud: session.did.id,
-          iss: session.did.id,
-          resources: [
-            ...(session.cacao.p.resources ?? []),
-            `prev:${innerCacaoCID.toString()}`,
-            `prev:${delegatedCacaoCID.toString()}`,
-          ],
+        const data = (event.data as string).replace(/^m/, "");
+        const bytes = base64nopad.decode(data);
+        const car = this.carFactory.fromBytes(bytes);
+        const root = car.roots[0];
+        if (!root) {
+          throw new Error(
+            `Unable to find root at the event: ${eventId.toString()}`,
+          );
+        }
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        const dagJOSE = car.get(root);
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-assignment
+        const payloadCID = dagJOSE.link;
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument,@typescript-eslint/no-unsafe-assignment
+        const payload = car.get(payloadCID);
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        const message = payload.data.message as string;
+        this.signal.value = {
+          message: message,
         };
-        const signedCacao = await createJwsCacao(session.did, selfCacaoP);
-        const signedCacaoCID = car.put(signedCacao);
-        console.log('s', signedCacaoCID.toString())
-
-        // // const rootCID = car.roots[0];
-        // if (!rootCID) {
-        //   throw new Error("No root CID");
-        // }
-        // const rootCacaoBlock = car.blocks.get(rootCID);
-        // if (!rootCacaoBlock) {
-        //   throw new Error(`Can't find cid ${rootCID.toString()}`);
-        // }
-        // const cacao = await Cacao.fromBlockBytes(rootCacaoBlock.payload);
-        // const cacaoResources = cacao.p.resources ?? [];
-        // const biscuitResource = cacaoResources
-        //   .find((r) => r.startsWith("biscuit:"))
-        //   ?.replace("biscuit:", "");
-        // if (!biscuitResource) {
-        //   throw new Error(`Can't find biscuit`);
-        // }
-        // const biscuitString = utf8.encode(
-        //   base64urlnopad.decode(biscuitResource),
-        // );
-        // console.log("biscuit", biscuitString);
-        // const builder = new BiscuitBuilder();
-        // builder.addCode(biscuitString);
       })
       .catch((error) => {
         console.error(error);

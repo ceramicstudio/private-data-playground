@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 import { type DID } from "dids";
 import { type UnknownContent } from "@/types";
@@ -52,7 +52,11 @@ export const writeToRecon = async (car: CAR, endpoint: string) => {
   }
 };
 
-export const getEvent = async (event: string, endpoint: string) => {
+export async function getEvent(
+  event: string,
+  endpoint: string,
+  capability?: string,
+) {
   try {
     const response = await fetch(`${endpoint}/ceramic/events/${event}`, {
       method: "GET",
@@ -66,4 +70,4 @@ export const getEvent = async (event: string, endpoint: string) => {
   } catch (error) {
     console.error(error);
   }
-};
+}
