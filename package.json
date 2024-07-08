@@ -69,6 +69,7 @@
     "react": "18.2.0",
     "react-textarea-autosize": "^8.5.3",
     "react-use": "^17.5.0",
+    "siwe-recap": "^0.0.1-alpha.0",
     "tailwind-merge": "^2.2.2",
     "tailwindcss-animate": "^1.0.7",
     "tsx": "^4.9.3",
