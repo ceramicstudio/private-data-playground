@@ -4,9 +4,8 @@ import { CARFactory, CAR } from 'cartonne'
 import {DID} from "dids";
 import {GetWalletClientResult} from "@wagmi/core";
 import {biscuit, check, fact} from "@biscuit-auth/biscuit-wasm";
-import {encodeBase64url} from "did-jwt/lib/util";
-import {Cacao} from "@didtools/cacao";
-import { decode } from 'codeco'
+import {Cacao, Payload} from "@didtools/cacao";
+import { decode } from "codeco";
 import {uint8ArrayAsBase64url} from "@didtools/codecs";
 
 export type AccessToken = {
@@ -14,8 +13,15 @@ export type AccessToken = {
     car: CAR;
 }
 
+function encodeBase64url(s: string): string {
+    return uint8ArrayAsBase64url.encode(
+        new Uint8Array(AuthSession.textEncoder.encode(s)),
+    )
+}
+
 export class AuthSession {
     static carFactory = new CARFactory();
+    static textEncoder = new TextEncoder();
     static textDecoder = new TextDecoder();
     inner: DIDSession;
     delegated: DID;
@@ -27,35 +33,38 @@ export class AuthSession {
 
     async getAccessToken(): Promise<AccessToken> {
         const car = AuthSession.carFactory.build()
-        const delegationCID = car.put(inner.cacao)
+        const delegationCID = car.put(this.inner.cacao)
 
         // create a biscuit for specification
         const builder = biscuit`
             user(${this.delegated.id});
         `;
-        for(resource in inner.cacao().p.resources) {
+        for(const resource in this.inner.cacao.p.resources) {
             builder.addFact(fact`right(${this.delegated.id}, ${resource}`)
         }
 
         // create a cacao for short term attenuation
         const exp = new Date(Date.now() + 1000*60*5) //5 minutes
         builder.addCheck(check`check if time($time) < ${exp.toISOString()}`)
-        const attenuatedCacao: Cacao = {
-            ...inner.cacao.p,
+        const attenuatedCacao: Payload = {
+            ...this.inner.cacao.p,
             aud: this.delegated.id,
             iss: this.delegated.id,
             resources: [
-                ...(inner.cacao.p.resources ?? []),
+                ...(this.inner.cacao.p.resources ?? []),
                 `prev:${delegationCID.toString()}`,
                 `biscuit:${encodeBase64url(builder.toString())}`
             ],
-            expirationTime: exp.toISOString()
+            exp: exp.toISOString()
         };
         // sign our attenuated cacao
         const jws = await this.delegated.createJWS(attenuatedCacao)
+        if(jws.signatures.length == 0 || !jws.signatures[0]) {
+            throw new Error('Failed to sign attenuated cacao')
+        }
         const header = jws.signatures[0].protected
         const headerBytes = decode(uint8ArrayAsBase64url, header)
-        const headerString = this.textDecoder.decode(headerBytes)
+        const headerString = AuthSession.textDecoder.decode(headerBytes)
         const headerJSON = JSON.parse(headerString)
         const signedCacao: Cacao = {
             h: {
@@ -70,13 +79,20 @@ export class AuthSession {
         };
 
         car.put(signedCacao, { isRoot: true });
+        return {
+            did: this.delegated,
+            car,
+        }
     }
 
     static async initialize(walletClient: GetWalletClientResult): Promise<AuthSession> {
+        if(!walletClient) {
+            throw new Error('No wallet client');
+        }
         const accountId = (await getAccountId(
             walletClient,
             walletClient.account.address,
-        )) as string;
+        )) as unknown as string;
 
         const authMethod = await EthereumWebAuth.getAuthMethod(
             walletClient,

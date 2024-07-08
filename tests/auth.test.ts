@@ -1,8 +1,8 @@
-import { AuthSession } from '@/zustand/auth';
+import { AuthSession } from '../src/zustand/auth';
 import { createWalletClient, http } from 'viem'
 import { foundry } from 'viem/chains'
 import { jest } from '@jest/globals'
-import {type GetWalletClientResult} from "@wagmi/core";
+import {GetWalletClientResult} from "@wagmi/core";
 import {CID} from "multiformats/cid";
 import {CAR} from "cartonne";
 import {Cacao} from '@didtools/cacao';
@@ -80,7 +80,7 @@ async function verifyCACAOChain(car: CAR) {
 }
 
 describe('Auth Session', () => {
-    wallet: GetWalletClientResult
+    let wallet: GetWalletClientResult
 
     beforeEach(async () => {
         wallet = getMockWalletClient()
@@ -88,12 +88,13 @@ describe('Auth Session', () => {
 
     test('should create a valid cacao for refresh', async () => {
         const auth = await AuthSession.initialize(wallet)
-        await verifyCACAOChain(auth.refreshToken)
+        expect(auth.inner.cacao.p.resources).toEqual(["ceramic://*?model=kjzl6hvfrbw6cadyci5lvsff4jxl1idffrp2ld3i0k1znz0b3k67abkmtf7p7q3"])
+        expect(auth.inner.cacao.p.aud).toEqual(auth.delegated.id)
     })
 
     test('should create a valid cacao for access', async () => {
         const auth = await AuthSession.initialize(wallet)
         const token = await auth.getAccessToken()
-        await verifyCACAOChain(token.capability)
+        await verifyCACAOChain(token.car)
     })
 })
