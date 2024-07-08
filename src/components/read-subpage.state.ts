@@ -1,5 +1,6 @@
 import type { DIDSession } from "did-session";
 import { signal, type Signal } from "@preact/signals-react";
+import type { StreamID } from "@/components/services/stream-id";
 
 type Underlying = {
   message: string | undefined;
@@ -14,6 +15,10 @@ export class ReadSubpageState {
     this.session = session;
     this.endpoint = endpoint;
     this.signal = signal({ message: undefined });
+  }
+
+  loadStream(streamId: StreamID, capability: string) {
+      // Do Nothing
   }
 
   get message() {

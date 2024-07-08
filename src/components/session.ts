@@ -6,6 +6,7 @@ import type { AccountId } from "caip";
 import { useAccount, useWalletClient } from "wagmi";
 import { useEffect, useMemo } from "react";
 import { useSignals } from "@preact/signals-react/runtime";
+import { WalletClient } from "viem";
 
 enum Stage {
   PROGRESS,
@@ -13,23 +14,29 @@ enum Stage {
   LOGGED_OUT,
 }
 
-type Underlying = {
-  stage: Stage;
-  session: DIDSession | undefined;
-};
+type Underlying =
+  | { stage: Stage.LOGGED_OUT }
+  | { stage: Stage.PROGRESS }
+  | {
+      stage: Stage.LOGGED_IN;
+      session: DIDSession;
+      walletClient: WalletClient;
+      accountId: AccountId;
+    };
 
 export class SessionState {
   private readonly signal: Signal<Underlying>;
 
   constructor() {
-    this.signal = signal({ stage: Stage.LOGGED_OUT, session: undefined });
+    this.signal = signal<Underlying>({
+      stage: Stage.LOGGED_OUT,
+    });
   }
 
   logIn(walletClient: GetWalletClientResult | undefined): void {
     if (!walletClient) return;
     this.signal.value = {
       stage: Stage.PROGRESS,
-      session: undefined,
     };
     getAccountId(walletClient, walletClient.account.address)
       .then(async (accountId: AccountId) => {
@@ -38,7 +45,7 @@ export class SessionState {
           accountId,
         );
 
-        // @ts-expect-error
+        // @ts-expect-error authMethod is not quite compatible by types
         const session = await DIDSession.get(accountId, authMethod, {
           resources: [
             "ceramic://*?model=kjzl6hvfrbw6cadyci5lvsff4jxl1idffrp2ld3i0k1znz0b3k67abkmtf7p7q3",
@@ -49,19 +56,21 @@ export class SessionState {
         this.signal.value = {
           stage: Stage.LOGGED_IN,
           session: session,
+          walletClient: walletClient,
+          accountId: accountId,
         };
       })
       .catch((error) => {
         this.signal.value = {
           stage: Stage.LOGGED_OUT,
-          session: undefined,
         };
         console.error(error);
       });
   }
 
   get isLoggedIn(): boolean {
-    return Boolean(this.signal.value.session);
+    const current = this.signal.value;
+    return current.stage === Stage.LOGGED_IN;
   }
 
   get isLoggedOut(): boolean {
@@ -69,13 +78,15 @@ export class SessionState {
   }
 
   get didSession() {
-    return this.signal.value.session;
+    const current = this.signal.value;
+    if (current.stage === Stage.LOGGED_IN) {
+      return current.session;
+    }
   }
 
   logOut(): void {
     this.signal.value = {
       stage: Stage.LOGGED_OUT,
-      session: undefined,
     };
   }
 }
