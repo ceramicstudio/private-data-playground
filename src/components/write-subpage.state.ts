@@ -9,10 +9,9 @@ import { type DID } from "dids";
 import { eventToCAR } from "@/components/services/encoding";
 import { base64urlnopad, utf8 } from "@scure/base";
 import type { Cacao } from "@didtools/cacao";
-import { uint8ArrayAsBase64url } from "@didtools/codecs";
 import { CARFactory } from "cartonne";
 import { type Signal, signal } from "@preact/signals-core";
-import { decode } from "codeco";
+import { createJwsCacao } from "@/components/create-jws-cacao";
 
 type Underlying = {
   message: string | undefined;
@@ -91,9 +90,8 @@ export class WriteSubpageState {
         const innerCacao = session.cacao;
         const innerResources = innerCacao.p.resources ?? [];
         const car = this.carFactory.build();
-        const delegationCID = car.put(innerCacao);
+        const innerCacaoCID = car.put(innerCacao);
         for (const resource of innerResources) {
-          console.log("d", delegatee, resource);
           builder.addFact(fact`right(${delegatee}, ${resource})`);
         }
         const second = 1000;
@@ -114,31 +112,13 @@ export class WriteSubpageState {
           iss: session.did.id,
           resources: [
             ...innerResources,
-            `prev:${delegationCID.toString()}`,
+            `prev:${innerCacaoCID.toString()}`,
             `biscuit:${biscuitB64U}`,
           ],
           exp: exp.toUTCString(),
         };
 
-        const jws = await session.did.createJWS(attenuatedCacaoP);
-        const header = jws.signatures[0]!.protected;
-        const headerBytes = decode(uint8ArrayAsBase64url, header);
-        const headerString = utf8.encode(headerBytes);
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        const headerJSON = JSON.parse(headerString);
-        const signedCacao: Cacao = {
-          h: {
-            t: "caip122",
-          },
-          p: attenuatedCacaoP,
-          s: {
-            // @ts-expect-error No "jws" in codecs
-            t: "jws",
-            s: jws.signatures[0]!.signature,
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-            m: headerJSON,
-          },
-        };
+        const signedCacao = await createJwsCacao(session.did, attenuatedCacaoP);
         car.put(signedCacao, { isRoot: true });
         // TODO Multiformats U?
         const capability = base64urlnopad.encode(car.bytes);

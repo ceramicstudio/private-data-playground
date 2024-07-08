@@ -3,10 +3,10 @@ import { DIDSession } from "did-session";
 import type { GetWalletClientResult } from "@wagmi/core";
 import { EthereumWebAuth, getAccountId } from "@didtools/pkh-ethereum";
 import type { AccountId } from "caip";
+import type { WalletClient } from "viem";
 import { useAccount, useWalletClient } from "wagmi";
 import { useEffect, useMemo } from "react";
 import { useSignals } from "@preact/signals-react/runtime";
-import { WalletClient } from "viem";
 
 enum Stage {
   PROGRESS,
