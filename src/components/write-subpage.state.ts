@@ -115,7 +115,7 @@ export class WriteSubpageState {
             `prev:${innerCacaoCID.toString()}`,
             `biscuit:${biscuitB64U}`,
           ],
-          exp: exp.toUTCString(),
+          exp: exp.toISOString(),
         };
 
         const signedCacao = await createJwsCacao(session.did, attenuatedCacaoP);
