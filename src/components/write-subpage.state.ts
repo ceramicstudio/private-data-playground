@@ -101,7 +101,7 @@ export class WriteSubpageState {
         const month = 30 * day;
         const exp = new Date(Date.now() + month); // 1 month
         builder.addCheck(
-          check`check if time($time), $time < "${exp.toISOString()}"`,
+          check`check if time($time), $time < ${exp.toISOString()}`,
         );
         const biscuitString = builder.toString();
         const biscuitB64U = base64urlnopad.encode(utf8.decode(biscuitString));
