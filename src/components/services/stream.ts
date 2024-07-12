@@ -58,11 +58,15 @@ export async function getEvent(
   capability?: string,
 ) {
   try {
+    const headers: HeadersInit = {
+      "Content-Type": "application/json",
+    };
+    if (capability) {
+      headers.Authorization = capability;
+    }
     const response = await fetch(`${endpoint}/ceramic/events/${event}`, {
       method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: headers,
     });
     const result = (await response.json()) as Record<string, unknown>;
     console.log(result);
