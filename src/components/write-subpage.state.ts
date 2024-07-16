@@ -78,8 +78,11 @@ export class WriteSubpageState {
       });
   }
 
-  createCapability(delegatee: string): void {
-    if (!delegatee) return;
+  createCapability(delegateeRaw: string): void {
+    if (!delegateeRaw) return;
+    const delegatee = delegateeRaw.startsWith("0x")
+      ? `did:pkh:eip155:1:${delegateeRaw}`
+      : delegateeRaw;
     const session = this.session;
     if (!session) return;
     const current = this.signal.value;
