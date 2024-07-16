@@ -22,7 +22,7 @@ export const createEvent = async (
   });
 };
 
-export const writeToRecon = async (car: CAR, endpoint: string) => {
+export async function writeToRecon(car: CAR, endpoint: string): Promise<void> {
   try {
     if (!car) {
       throw new Error("Error creating CAR file");
@@ -35,25 +35,20 @@ export const writeToRecon = async (car: CAR, endpoint: string) => {
       id: cid!.toString(),
     });
 
-    console.log(body);
-
-    const response = await fetch(`${endpoint}/ceramic/events`, {
+    await fetch(`${endpoint}/ceramic/events`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body,
     });
-    const result = (await response.json()) as Record<string, unknown>;
-    console.log(result);
-    return result;
   } catch (error) {
     console.error(error);
   }
-};
+}
 
 export async function getEvent(
-  event: string,
+  eventId: string,
   endpoint: string,
   capability?: string,
 ) {
@@ -64,13 +59,15 @@ export async function getEvent(
     if (capability) {
       headers.Authorization = capability;
     }
-    const response = await fetch(`${endpoint}/ceramic/events/${event}`, {
+    const endpointURL = new URL(`${endpoint}/`.replace(/\/\/$/, "/"));
+    const url = new URL(`/ceramic/events/${eventId}`, endpointURL);
+    url.searchParams.set("resource", eventId);
+
+    const response = await fetch(url, {
       method: "GET",
       headers: headers,
     });
-    const result = (await response.json()) as Record<string, unknown>;
-    console.log(result);
-    return result;
+    return (await response.json()) as Record<string, unknown>;
   } catch (error) {
     console.error(error);
   }
