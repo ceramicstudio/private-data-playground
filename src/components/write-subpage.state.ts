@@ -83,7 +83,9 @@ export class WriteSubpageState {
     const session = this.session;
     if (!session) return;
     const current = this.signal.value;
-    if (!current.streamID) return;
+    const streamID = current.streamID;
+    if (!streamID) return;
+    const eventId = streamID.cid.toString();
     import("@biscuit-auth/biscuit-wasm")
       .then(async (module) => {
         const biscuit = module.biscuit;
@@ -98,14 +100,9 @@ export class WriteSubpageState {
         const car = this.carFactory.build();
         const innerCacaoCID = car.put(innerCacao);
         for (const resource of innerResources) {
-          const wildCardMatch = resource.match(/ceramic:\/\/\*\?model\=(\w+)/);
-          if (wildCardMatch) {
-            const modelId = wildCardMatch[1];
-            builder.addFact(fact`rightModel(${delegatee}, ${modelId})`);
-          } else {
-            builder.addFact(fact`right(${delegatee}, ${resource})`);
-          }
+          builder.addFact(fact`right(${delegatee}, ${resource})`);
         }
+        builder.addFact(fact`right(${delegatee}, ${eventId})`);
         const second = 1000;
         const minute = 60 * second;
         const hour = 60 * minute;
@@ -114,6 +111,7 @@ export class WriteSubpageState {
         const exp = new Date(Date.now() + month); // 1 month
         builder.addCheck(check`check if time($time), $time < ${exp}`);
         const biscuitString = builder.toString();
+        console.log("bs", biscuitString);
         const biscuitB64U = base64urlnopad.encode(utf8.decode(biscuitString));
 
         const attenuatedCacaoP: Cacao["p"] = {
