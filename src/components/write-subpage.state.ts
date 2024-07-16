@@ -55,10 +55,16 @@ export class WriteSubpageState {
     createEvent(session.did as unknown as DID, { message }, MODEL_STREAM_ID)
       .then(async (event) => {
         const car = eventToCAR(event.codec, event.signedEvent);
-        const _response = await writeToRecon(car, this.endpoint);
+        await writeToRecon(car, this.endpoint);
+
+        const readCapabilityCAR = this.carFactory.build();
+        readCapabilityCAR.put(session.cacao, { isRoot: true });
+        const readCapability = base64urlnopad.encode(readCapabilityCAR.bytes);
+
         const gotEvent = await getEvent(
           car.roots[0]!.toString(),
           this.endpoint,
+          readCapability,
         );
         const streamID = new StreamID("MID", gotEvent?.id as string).baseID;
         this.signal.value = {
@@ -92,7 +98,13 @@ export class WriteSubpageState {
         const car = this.carFactory.build();
         const innerCacaoCID = car.put(innerCacao);
         for (const resource of innerResources) {
-          builder.addFact(fact`right(${delegatee}, ${resource})`);
+          const wildCardMatch = resource.match(/ceramic:\/\/\*\?model\=(\w+)/);
+          if (wildCardMatch) {
+            const modelId = wildCardMatch[1];
+            builder.addFact(fact`rightModel(${delegatee}, ${modelId})`);
+          } else {
+            builder.addFact(fact`right(${delegatee}, ${resource})`);
+          }
         }
         const second = 1000;
         const minute = 60 * second;
