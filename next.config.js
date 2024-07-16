@@ -11,7 +11,6 @@ function patchWasmModuleImport(config, isServer) {
     asyncWebAssembly: true,
   };
 
-  console.log("isServer", isServer);
   if (isServer) {
     config.output.webassemblyModuleFilename =
       "./../server/chunks/[modulehash].wasm";
