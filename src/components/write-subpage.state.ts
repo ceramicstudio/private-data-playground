@@ -99,9 +99,9 @@ export class WriteSubpageState {
         const innerResources = innerCacao.p.resources ?? [];
         const car = this.carFactory.build();
         const innerCacaoCID = car.put(innerCacao);
-        for (const resource of innerResources) {
-          builder.addFact(fact`right(${delegatee}, ${resource})`);
-        }
+        // for (const resource of innerResources) {
+        //   builder.addFact(fact`right(${delegatee}, ${resource})`);
+        // }
         builder.addFact(fact`right(${delegatee}, ${eventId})`);
         const second = 1000;
         const minute = 60 * second;
