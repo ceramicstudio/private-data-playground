@@ -43,7 +43,7 @@ In your browser you'll see a simple application layout with the option to "Conne
 
 2. You will see a secondary signature request with the message "Give this application access to some of your data on Ceramic" - signing this request will create an authenticated browser session that the application will reference when writing data on your behalf. Go ahead and approve this request by clicking "Sign In".
 
-3. You will be prompted to enter a message - this can be any arbitrary message you'd like to use. Go ahead and enter this here and click "Create".
+3. Click on the "Write" toggle above the "C1 Endpoint" box. You will be prompted to enter a message - this can be any arbitrary message you'd like to use. Go ahead and enter this here and click "Create".
 
 4. Open up your computer notepad and save the value you'll see under "Stream ID". We will need this later.
 
@@ -51,7 +51,7 @@ In your browser you'll see a simple application layout with the option to "Conne
 
 6. Finally, click "Create Capability" to generate the capability object which delegates read access to the Eth address you own. Paste the result into your notepad as well - we will use this later.
 
-### Reading Data 
+### Reading Data Successfully
 
 1. Manually disconnect the account you used for the previous session and sign in using the address you entered for step 5 from the previous section.
 
@@ -62,5 +62,13 @@ In your browser you'll see a simple application layout with the option to "Conne
 4. Do the same for the "Capability" text input.
 
 5. Click on the "Load" button in order to load the stream contents given the delegated capability.
+
+6. You should now be able to view the original message you entered and saved from the previous section.
+
+### Reading Data Unsuccessfully
+
+1. Still in the same UI, make a random change to the capability value under "Capability" thus invalidating it.
+
+2. Press "Load" again - you will see that we are now unable to access the same stream due to the invalid capability object.
 
 
