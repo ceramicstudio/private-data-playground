@@ -91,7 +91,7 @@ export function fromString(
   input: string,
   title = 'StreamRef',
 ): StreamRefComponents {
-  const protocolMatch = URL_PATTERN.exec(input) || []
+  const protocolMatch = URL_PATTERN.exec(input) ?? []
   const base = protocolMatch[2]
   if (!base) throw new Error(`Malformed ${title} string: ${input}`)
   const bytes = base36.decode(base)

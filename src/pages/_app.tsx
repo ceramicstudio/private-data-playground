@@ -26,10 +26,10 @@ const MyApp: AppType = ({
     <WagmiConfig config={wagmiConfig}>
       <main className={font.className}>
         <Head>
-          <link rel="icon" href="/logo.png" />
-          <meta property="og:image" content="/logo.png" />
+          <link rel="icon" href="/ceramic-favicon.svg" />
+          <meta property="og:image" content="/ceramic-favicon.svg" />
           <meta property="og:type" content="website" />
-          <meta name="twitter:image" content="/logo.png" />
+          <meta name="twitter:image" content="/ceramic-favicon.svg" />
         </Head>
         <ThemeProvider>
           <Navbar />

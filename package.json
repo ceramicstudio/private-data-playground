@@ -1,13 +1,11 @@
 {
-  "name": "privacy-app",
+  "name": "private-data-playground",
   "version": "0.1.0",
   "private": true,
   "type": "module",
   "scripts": {
     "build": "next build",
-    "generate": "node scripts/commands.mjs",
     "dev": "next dev",
-    "ceramic": "ceramic-one daemon",
     "lint": "next lint",
     "start": "next start"
   },
