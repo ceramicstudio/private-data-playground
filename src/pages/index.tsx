@@ -25,7 +25,7 @@ export default function Home() {
   return (
     <div className="min-h-screen">
       <Head>
-        <title>Create Trust Credentials</title>
+        <title>Private Data Playground</title>
         <meta name="description" content="" />
         <link rel="icon" href="/ceramic-favicon.svg" />
         <meta property="og:title" content="" />
