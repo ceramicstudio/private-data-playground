@@ -40,7 +40,7 @@ In your browser you'll see a simple application layout with the option to "Conne
 
 1. Click the "Connect Wallet" button to connect your wallet. Keep track of which account you use for this portion - we will be using different accounts to read this data. Please ensure you are authenticating with Eth Mainnet for all sign-ins throughout this demo.
 
-2. You will see a secondary signature request with the message "Give this application access to some of your data on Ceramic" - signing this request will create an authenticated browser session that the application will reference when writing data on your behalf. Go ahead and approve this request by clicking "Sign In".
+2. You will see a signature request with the message "Give this application access to some of your data on Ceramic" - signing this request will create an authenticated browser session that the application will reference when writing data on your behalf. Go ahead and approve this request by clicking "Sign In".
 
 3. Click on the "Write" toggle above the "C1 Endpoint" box. You will be prompted to enter a message - this can be any arbitrary message you'd like to use. Go ahead and enter this here and click "Create".
 
