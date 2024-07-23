@@ -16,7 +16,7 @@ const PROJECT_ID = process.env.NEXT_PUBLIC_PROJECT_ID ?? "";
 const chains = [mainnet];
 const wagmiConfig = defaultWagmiConfig({ chains, projectId: PROJECT_ID });
 
-createWeb3Modal({ wagmiConfig, projectId: PROJECT_ID, chains });
+createWeb3Modal({ wagmiConfig, projectId: PROJECT_ID, chains, themeMode: "light" });
 
 const MyApp: AppType = ({
   Component,
