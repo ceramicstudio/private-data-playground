@@ -13,7 +13,6 @@ In your new environment file, assign this value to `NEXT_PUBLIC_PROJECT_ID`.
 3. Clone the [rust-ceramic](https://github.com/ceramicnetwork/rust-ceramic) repository and check out into the [feat/private-data](https://github.com/ceramicnetwork/rust-ceramic/tree/feat/private-data) branch. Next, run the build process before initializing your node:
 
 ```bash
-cargo build
 cargo run -p ceramic-one -- daemon
 ```
 
