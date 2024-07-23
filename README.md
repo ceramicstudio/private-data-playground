@@ -46,7 +46,7 @@ In your browser you'll see a simple application layout with the option to "Conne
 
 4. Open up your computer notepad and save the value you'll see under "Stream ID". We will need this later.
 
-5. Grab another Eth address that you own and enter it into the text area underneath "Delegate read access to" - you will see that `did:pkh:eip155:1:` is automatically appended to your address in order to conform to `did:pkh` formatting. Make a note of which address you entered
+5. Grab another Eth address that you own and enter it into the text area underneath "Delegate read access to". Make a note of which address you entered
 
 6. Finally, click "Create Capability" to generate the capability object which delegates read access to the Eth address you own. Paste the result into your notepad as well - we will use this later.
 
