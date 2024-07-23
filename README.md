@@ -52,7 +52,7 @@ In your browser you'll see a simple application layout with the option to "Conne
 
 ### Reading Data Successfully
 
-1. Manually disconnect the account you used for the previous session and sign in using the address you entered for step 5 from the previous section.
+1. Manually disconnect the account you used for the previous session and sign in using the address you entered for step 5 from the previous section (or open the app in a new incognito tab). 
 
 2. Click the "Read" toggle above the "C1 Endpoint" box.
 
