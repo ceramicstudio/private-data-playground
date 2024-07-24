@@ -27,7 +27,7 @@ export default function Home() {
       <Head>
         <title>Private Data Playground</title>
         <meta name="description" content="" />
-        <link rel="icon" href="/ceramic-favicon.svg" />
+        <link rel="icon" href="./ceramic-favicon.svg" />
         <meta property="og:title" content="" />
         <meta property="og:description" content="" />
       </Head>
