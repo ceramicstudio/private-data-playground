@@ -106,7 +106,7 @@ export function WriteSubpage(props: { stateFactory: () => WriteSubpageState }) {
                       </p>
                       <TextareaAutosize
                         className="outline-dark mt-4 min-h-12 resize-none border border-gray-800 text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="Enter ethereum address to delegate to..."
+                        placeholder="Enter your desired delegated Eth address here..."
                         value={delegatee.value}
                         onChange={(e) => {
                           delegatee.value = e.target.value;

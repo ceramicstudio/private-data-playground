@@ -9,6 +9,7 @@ const config = {
   ],
   "ignorePatterns": [
     "scripts",
+    "env.js",
   ],
   "extends": [
     "next/core-web-vitals",

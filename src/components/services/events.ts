@@ -17,7 +17,6 @@ import {
   sparse,
   string,
   tuple,
-  validate,
   unknown,
   Type,
   type Context,

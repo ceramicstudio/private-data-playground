@@ -1,10 +1,9 @@
 import { type CAR, CARFactory, CarBlock } from "cartonne";
 import { type Codec } from "codeco";
 import { SignedEvent } from "./events";
-import { DagJWS } from "@didtools/codecs";
 import * as dagJson from "@ipld/dag-json";
 import * as dagJose from "dag-jose";
-import { bases } from "multiformats/basics";
+import { type bases } from "multiformats/basics";
 import { CID } from "multiformats/cid";
 import { toString as bytesToString, fromString } from "uint8arrays";
 import { sha256 } from "multihashes-sync/sha2";
@@ -12,6 +11,7 @@ import { sha256 } from "multihashes-sync/sha2";
 export const MAX_BLOCK_SIZE = 256000; // 256 KB
 
 export function base64urlToJSON<T = Record<string, unknown>>(value: string): T {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
   return JSON.parse(bytesToString(fromString(value, "base64url")));
 }
 
@@ -25,7 +25,7 @@ export function restrictBlockSize(block: Uint8Array, cid: CID): void {
   const size = block.byteLength;
   if (size > MAX_BLOCK_SIZE) {
     throw new Error(
-      `${cid} commit size ${size} exceeds the maximum block size of ${MAX_BLOCK_SIZE}`,
+      `${cid.toString()} commit size ${size} exceeds the maximum block size of ${MAX_BLOCK_SIZE}`,
     );
   }
 }
@@ -56,7 +56,9 @@ export function signedEventToCAR(event: SignedEvent): CAR {
   const payloadCID = jws.link;
   if (payloadCID != null) {
     // Encode payload
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     car.blocks.put(new CarBlock(payloadCID, linkedBlock));
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     restrictBlockSize(linkedBlock, payloadCID);
   }
 

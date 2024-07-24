@@ -20,7 +20,7 @@ export function createCID<T = unknown>(
   const bytes = codec.encode(value)
   // digest call is synchronous, no need to await
   const hash = sha256.digest(bytes) as Digest<DigestCode, number>
-  return CID.createV1(codec.code, hash) as CID<T, CodecCode, DigestCode, 1>
+  return CID.createV1(codec.code, hash)
 }
 
 export function getCodeByName(name: StreamTypeName): StreamTypeCode {
