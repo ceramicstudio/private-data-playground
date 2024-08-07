@@ -10,9 +10,18 @@ This demo application uses a minimal webapp to demonstrate how Ceramic can facil
 
 In your new environment file, assign this value to `NEXT_PUBLIC_PROJECT_ID`.
 
-3. Clone the [rust-ceramic](https://github.com/ceramicnetwork/rust-ceramic) repository and check out into the [feat/private-data](https://github.com/ceramicnetwork/rust-ceramic/tree/feat/private-data) branch. Next, run the build process before initializing your node:
+3. Clone the [rust-ceramic](https://github.com/ceramicnetwork/rust-ceramic) repository and check out into the [feat/private-data](https://github.com/ceramicnetwork/rust-ceramic/tree/feat/private-data) branch. Next, install Profobuf, run the build process, and initialize your node:
 
 ```bash
+# Install protobuf (can alternatively use `brew install protobuf`)
+PROTOC_VERSION=3.20.1
+PROTOC_ZIP=protoc-$PROTOC_VERSION-linux-x86_64.zip
+curl --retry 3 --retry-max-time 90 -OL https://github.com/protocolbuffers/protobuf/releases/download/v$PROTOC_VERSION/$PROTOC_ZIP \
+    && unzip -o $PROTOC_ZIP -d /usr/local bin/protoc \
+    && unzip -o $PROTOC_ZIP -d /usr/local 'include/*' \
+    && rm -f $PROTOC_ZIP
+
+# Build and initialize node
 cargo run -p ceramic-one -- daemon
 ```
 
