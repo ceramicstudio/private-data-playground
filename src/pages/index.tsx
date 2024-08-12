@@ -14,7 +14,7 @@ import { WriteSubpageState } from "@/components/write-subpage.state";
 import { ReadSubpageState } from "@/components/read-subpage.state";
 
 const ENV_DISPLAY_ENDPOINT = true;
-const DEFAULT_ENDPOINT = "http://localhost:5001";
+const DEFAULT_ENDPOINT = "http://localhost:5101";
 
 export default function Home() {
   useSignals();
