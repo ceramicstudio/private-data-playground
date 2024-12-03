@@ -54,6 +54,9 @@ const config = {
     patchWasmModuleImport(config, options.isServer);
     return config;
   },
+  assetPrefix: "./",
 };
+
+
 
 export default config;
